@@ -37,5 +37,3 @@ variable "customer_gateway_tunnel_ip" {
 variable "peer_owner_id" {}
 
 variable "peer_vpc_id" {}
-
-variable "ssh_key_bucket_name" {}

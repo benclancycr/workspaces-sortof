@@ -285,75 +285,26 @@ resource "aws_vpc_peering_connection" "peering_connection" {
   vpc_id        = "${aws_vpc.main.id}"
 }
 
-### S3 Bucket Section ###
-
-resource "aws_s3_bucket" "bucket_for_keys" {
-  bucket = "${var.ssh_key_bucket_name}"
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
-
-  tags = {
-    Description = "Bucket used to store ssh public keys"
-  }
-}
-
-### IAM Section ###
-resource "aws_iam_role" "role_developer" {
-  name = "role_developer"
-
-  assume_role_policy = <<EOF
-    {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-            "Service": "ec2.amazonaws.com"
-        },
-        "Effect": "Allow",
-        "Sid": ""
-        }
-    ]
-    }
-    EOF
-}
-
-resource "aws_iam_policy" "role_developer_policy" {
-  name = "role_developer_policy"
-
-  policy = <<EOF
-        {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-            "Action": [
-                "ec2:Describe*",
-                "ec2:List*",
-                "s3:List*",
-                "s3:Put*"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-            }
-        ]
-        }
-    EOF
-}
-
-resource "aws_iam_role_policy_attchment" "role_developer_attach" {
-  role       = "${aws_iam_role.role_developer.name}"
-  policy_arn = "${aws_iam_policy.role_developer_policy.arn}"
-}
-
 # elb
 # asg
 # asg security groups
 # ebs
 # private zone
 # dns conditional forwarder
+
 # lambda's:
 # ec2-start, ec2-stop, ec2-create-schedule, ec2-create-ad-hoc
 
+resource "aws_lambda_function" "ec2-start" {
+  filename      = "./lambda/ec2-start.zip"
+  function_name = "ec2-start"
+  role          = "${aws_iam_role.role_lambda.arn}"
+  handler       = "start.handle"
+  runtime       = "python2.7"
+
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
+}
