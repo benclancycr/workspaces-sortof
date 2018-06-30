@@ -6,7 +6,8 @@
             "Effect": "Allow",
             "Action": [
                 "ec2:DescribeInstances",
-                "ec2:DescribeInstanceStatus"
+                "ec2:DescribeInstanceStatus",
+                "ec2:StartInstances"
             ],
             "Resource": "*"
         }

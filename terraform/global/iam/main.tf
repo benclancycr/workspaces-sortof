@@ -45,7 +45,7 @@ resource "aws_iam_policy" "role_developer_policy" {
 }
 
 resource "aws_iam_policy" "role_lambda_policy" {
-  name = "${var.role_developer_policy_name}"
+  name = "${var.role_lambda_policy_name}"
 
   policy = "${data.template_file.local_file_role_lambda_policy.rendered}"
 }

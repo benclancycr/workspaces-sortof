@@ -13,3 +13,7 @@ variable "role_lambda_name" {
 variable "role_developer_policy_name" {
   default = "role_developer_policy"
 }
+
+variable "role_lambda_policy_name" {
+  default = "role_lambda_policy"
+}
