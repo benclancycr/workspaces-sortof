@@ -4,75 +4,43 @@ provider aws {
 
 terraform {
   backend "s3" {
-    bucket = "${var.remote_state_bucket}"
-    key    = "${var.remote_state_bucket_key}"
-    region = "${var.region}"
+    bucket = "companyid-remotestatebucket1098789"
+    key    = "terraform/global/iam/terraform.tfstate"
+    region = "eu-west-1"
   }
 }
 
-resource "aws_iam_role" "role_developer" {
-  name = "role_developer"
+data "template_file" "local_file_role_developer" {
+  template = "${file("${path.module}/files/role_developer.json")}"
+}
 
-  assume_role_policy = <<EOF
-    {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-            "Service": "ec2.amazonaws.com"
-        },
-        "Effect": "Allow",
-        "Sid": ""
-        }
-    ]
-    }
-    EOF
+data "template_file" "local_file_role_lambda" {
+  template = "${file("${path.module}/files/role_lambda.json")}"
+}
+
+data "template_file" "local_file_role_developer_policy" {
+  template = "${file("${path.module}/files/role_developer_policy.json")}"
+}
+
+resource "aws_iam_role" "role_developer" {
+  name = "${var.role_developer_name}"
+
+  assume_role_policy = "${data.template_file.local_file_role_developer.rendered}"
 }
 
 resource "aws_iam_role" "role_lambda" {
-  name = "role_lambda"
+  name = "${var.role_lambda_name}"
 
-  assume_role_policy = <<EOF
-    {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-            "Service": "ec2.amazonaws.com"
-        },
-        "Effect": "Allow",
-        "Sid": ""
-        }
-    ]
-    }
-    EOF
+  assume_role_policy = "${data.template_file.local_file_role_lambda.rendered}"
 }
 
 resource "aws_iam_policy" "role_developer_policy" {
-  name = "role_developer_policy"
+  name = "${var.role_developer_policy_name}"
 
-  policy = <<EOF
-        {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-            "Action": [
-                "ec2:Describe*",
-                "ec2:List*",
-                "s3:List*",
-                "s3:Put*"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-            }
-        ]
-        }
-    EOF
+  policy = "${data.template_file.local_file_role_developer_policy.rendered}"
 }
 
-resource "aws_iam_role_policy_attchment" "role_developer_attach" {
+resource "aws_iam_role_policy_attachment" "role_developer_attach" {
   role       = "${aws_iam_role.role_developer.name}"
   policy_arn = "${aws_iam_policy.role_developer_policy.arn}"
 }

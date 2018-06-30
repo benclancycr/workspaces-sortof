@@ -1,0 +1,10 @@
+Notes:
+
+Add routes in route tables(default route for workspace route table to point to nlb for proxy) 
+need to define sg rules
+match company naming standard
+clean up table association i.e. one association for both subnets
+Add a template input laod for vpc endpoint policy
+add a template input for iam policys
+define iam policy
+update lambdas in main.tf with correct handler
