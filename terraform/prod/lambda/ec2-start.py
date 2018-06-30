@@ -1,5 +1,5 @@
 """
-Lambda function to stop all ec2 instances in a vpc
+Lambda function to start all ec2 instances in a vpc
 """
 
 import boto3
@@ -13,7 +13,7 @@ def get_instances():
     filters = [
         {
             'Name': 'instance-state-name',
-            'Values': ['*']
+            'Values': ['stopped']
         }
     ]
     
@@ -26,12 +26,12 @@ def get_instances():
     
     return Instances
 
-def stop_instances(ec2_instances):
+def start_instances(ec2_instances):
     """
-    Function to stop all instances passed
+    Function to start all instances passed
     """
     for ec2_instance in ec2_instances:
-        EC2.instances.stop(ec2_instance)
+        EC2.instances.start(ec2_instance)
     
 
 def lambda_handler(event,context):
@@ -41,4 +41,4 @@ def lambda_handler(event,context):
     print(event)
     print(context)
     instances = get_instances()
-    stop_instances(instances)
+    start_instances(instances)

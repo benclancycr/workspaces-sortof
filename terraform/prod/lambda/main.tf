@@ -27,3 +27,20 @@ resource "aws_lambda_function" "ec2-start" {
   handler       = "ec2-start.lambda_handler"
   runtime       = "python2.7"
 }
+
+resource "aws_lambda_function" "ec2-stop" {
+  filename      = "./ec2-stop.zip"
+  function_name = "ec2-stop"
+  role          = "${data.terraform_remote_state.iam.role_lambda_arn}"
+  handler       = "ec2-stop.lambda_handler"
+  runtime       = "python2.7"
+}
+
+# resource "aws_lambda_function" "ec2-create" {
+#   filename      = "./ec2-create.zip"
+#   function_name = "ec2-create"
+#   role          = "${data.terraform_remote_state.iam.role_lambda_arn}"
+#   handler       = "ec2-create.lambda_handler"
+#   runtime       = "python2.7"
+# }
+
