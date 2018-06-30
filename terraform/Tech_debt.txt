@@ -8,3 +8,4 @@ Add a template input laod for vpc endpoint policy
 add a template input for iam policys
 define iam policy
 update lambdas in main.tf with correct handler
+add logging into lambdas

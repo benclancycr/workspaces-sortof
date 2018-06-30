@@ -54,7 +54,7 @@ resource "aws_lambda_function" "ec2-stop" {
 #   runtime       = "python2.7"
 # environment {
 #  variables {
-#    bucket_id = "${data.terraform_remote_state.s3.bucket_id}"
+#    BUCKET_ID = "${data.terraform_remote_state.s3.bucket_id}"
 #  }
 # }
 # }
