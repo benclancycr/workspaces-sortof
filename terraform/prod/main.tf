@@ -6,24 +6,14 @@ provider aws {
 
 terraform {
   backend "s3" {
-    bucket = "${var.remote_state_bucket}"
-    key    = "${var.remote_state_bucket_key}"
-    region = "${var.region}"
+    bucket = "companyid-remotestatebucket1098789"
+    key    = "terraform/prod/terraform.tfstate"
+    region = "eu-west-1"
   }
 }
 
 ### Data Section ###
 data "aws_availability_zones" "all" {}
-
-data "template_file" "user_data" {
-  template = "${file("${path.module}/user-data.sh")}"
-
-  vars {
-    server_port = "${var.server_port}"
-    db_address  = "${data.terraform_remote_state.db.address}"
-    db_port     = "${data.terraform_remote_state.db.port}"
-  }
-}
 
 ### VPC Section ###
 resource "aws_vpc" "main" {
@@ -298,13 +288,7 @@ resource "aws_vpc_peering_connection" "peering_connection" {
 resource "aws_lambda_function" "ec2-start" {
   filename      = "./lambda/ec2-start.zip"
   function_name = "ec2-start"
-  role          = "${aws_iam_role.role_lambda.arn}"
+  role          = "${data.terraform_remote_state.iam.role_lambda_arn}"
   handler       = "start.handle"
   runtime       = "python2.7"
-
-  environment {
-    variables = {
-      foo = "bar"
-    }
-  }
 }

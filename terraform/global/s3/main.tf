@@ -4,9 +4,9 @@ provider aws {
 
 terraform {
   backend "s3" {
-    bucket = "${var.remote_state_bucket}"
-    key    = "${var.remote_state_bucket_key}"
-    region = "${var.region}"
+    bucket = "companyid-remotestatebucket1098789"
+    key    = "terraform/global/s3/terraform.tfstate"
+    region = "eu-west-1"
   }
 }
 

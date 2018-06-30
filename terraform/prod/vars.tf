@@ -2,10 +2,6 @@ variable "region" {
   default = "eu-west-1"
 }
 
-variable "remote_state_bucket" {}
-
-variable "remote_state_bucket_key" {}
-
 variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
