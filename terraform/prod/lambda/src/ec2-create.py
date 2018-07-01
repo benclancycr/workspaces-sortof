@@ -21,7 +21,7 @@ def create_ec2_instances(self):
     """
     Function to create EC2 instances for every .pub file
     """
-    self = 'ben-clancy'
+    
     instance = EC2.create_instances(
         ImageId="ami-466768ac",
         MinCount=1,
