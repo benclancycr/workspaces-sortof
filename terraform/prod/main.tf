@@ -282,13 +282,3 @@ resource "aws_vpc_peering_connection" "peering_connection" {
 # private zone
 # dns conditional forwarder
 
-# lambda's:
-# ec2-start, ec2-stop, ec2-create-schedule, ec2-create-ad-hoc
-
-resource "aws_lambda_function" "ec2-start" {
-  filename      = "./lambda/ec2-start.zip"
-  function_name = "ec2-start"
-  role          = "${data.terraform_remote_state.iam.role_lambda_arn}"
-  handler       = "start.handle"
-  runtime       = "python2.7"
-}
