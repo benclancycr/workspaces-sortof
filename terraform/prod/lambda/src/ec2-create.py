@@ -5,27 +5,44 @@ EC2 instances based on .pub keys in an S3 bucket
 
 import boto3
 import os
+import json
 
 EC2 = boto3.resource('ec2')
-EBS = boto3.resource('ebs')
 
-def create_ebs_volumes(self):
+def modify_key(self):
     """
-    Function to create an EBS volume for every .pub file
+    Function to get key name
     """
-    EC2.create_ebs_volumes(volume_name)
+    keyname_with_extension = self['Records'][0]['s3']['object']['key']
+    keyname = os.path.split(keyname_with_extension)[0]
+    return keyname
 
-def create_ec2_instances(keys, volumes):
+def create_ec2_instances(self):
     """
     Function to create EC2 instances for every .pub file
     """
+    self = 'ben-clancy'
+    instance = EC2.create_instances(
+        ImageId="ami-466768ac",
+        MinCount=1,
+        MaxCount=1,
+        InstanceType="t2.micro",
+        BlockDeviceMappings=[
+            {
+                'DeviceName': '/dev/sda1',
+                'Ebs': {
+                    'VolumeSize': 32,
+                    'DeleteOnTermination': True,
+                    'VolumeType': 'standard',
+                    },
+            },
+        ]
+        )
+    EC2.create_tags(Resources=[instance[0].instance_id], Tags=[{'Key':'name', 'Value':self}])
 
 def lambda_handler(event,context):
     """
     Lambda function
     """
-    print(event)
-    print(context)
-    keys = get_s3_keys(BUCKET_ID)
-    volumes = create_ebs_volumes(keys)
-    create_ec2_instances(keys, volumes)
+    hostname = modify_key(event)
+    create_ec2_instances(hostname)

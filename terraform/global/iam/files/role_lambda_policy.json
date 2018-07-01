@@ -8,7 +8,11 @@
                 "ec2:DescribeInstances",
                 "ec2:DescribeInstanceStatus",
                 "ec2:StartInstances",
-                "ec2:StopInstances"
+                "ec2:StopInstances",
+                "ec2:CreateInstances",
+                "ec2:RunInstances",
+                "ec2:CreateTags",
+                "tag:TagResources"
             ],
             "Resource": "*"
         }
