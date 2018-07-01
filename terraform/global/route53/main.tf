@@ -31,14 +31,14 @@ resource "aws_route53_zone" "workstations" {
 
 resource "aws_route53_record" "workstations-ns" {
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "${aws_route53_zone.workstations.zone_id}"
+  name    = "workstations.${var.route53_zone_name}"
   type    = "NS"
   ttl     = "30"
 
   records = [
-    "${aws_route53_zone.dev.name_servers.0}",
-    "${aws_route53_zone.dev.name_servers.1}",
-    "${aws_route53_zone.dev.name_servers.2}",
-    "${aws_route53_zone.dev.name_servers.3}",
+    "${aws_route53_zone.workstations.name_servers.0}",
+    "${aws_route53_zone.workstations.name_servers.1}",
+    "${aws_route53_zone.workstations.name_servers.2}",
+    "${aws_route53_zone.workstations.name_servers.3}",
   ]
 }

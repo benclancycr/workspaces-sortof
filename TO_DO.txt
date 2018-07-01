@@ -1,0 +1,14 @@
+To do:
+- finish /prod/main.tf (Maybe split this out)
+- update readme with steps for customising & using
+- HA Squid
+- dns conditional forwarder
+- dhcp option set for vpc
+- Route53 Subdomain
+
+order to be run:
+- IAM
+- S3
+- prod/main.tf
+- Route53
+- Lambda

@@ -13,11 +13,13 @@ terraform {
 }
 
 ### Data Section ###
-data "aws_availability_zones" "all" {}
+data "aws_availability_zones" "available" {}
 
 ### VPC Section ###
 resource "aws_vpc" "main" {
-  cidr_block = "${var.vpc_cidr}"
+  cidr_block           = "${var.vpc_cidr}"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags {
     Name = "workspaces-vpc"
@@ -25,39 +27,43 @@ resource "aws_vpc" "main" {
 }
 
 ### Subnet Section ###
-resource "aws_subnet" "workspace_az1_subnet" {
-  vpc_id     = "${aws.vpc.main.id}"
-  cidr_block = "${var.workspace_az1_subnet_cidr}"
+resource "aws_subnet" "workspaces_az1_subnet" {
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.workspace_az1_subnet_cidr}"
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
   tags {
-    Name = "Subnet used by EC2 instances to provide Workstations"
+    Name = "Subnet_Workstations"
   }
 }
 
-resource "aws_subnet" "workspace_az2_subnet" {
-  vpc_id     = "${aws.vpc.main.id}"
-  cidr_block = "${var.workspace_az1_subnet_cidr}"
+resource "aws_subnet" "workspaces_az2_subnet" {
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.workspace_az2_subnet_cidr}"
+  availability_zone = "${data.aws_availability_zones.available.names[1]}"
 
   tags {
-    Name = "Subnet used by EC2 instances to provide Workstations"
+    Name = "Subnet_Workstations"
   }
 }
 
 resource "aws_subnet" "proxy_az1_subnet" {
-  vpc_id     = "${aws.vpc.main.id}"
-  cidr_block = "${var.proxy_az1_subnet_cidr}"
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.proxy_az1_subnet_cidr}"
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
   tags {
-    Name = "Subnet used by EC2 instances to provide proxy functionality"
+    Name = "Subnet_Proxy"
   }
 }
 
 resource "aws_subnet" "proxy_az2_subnet" {
-  vpc_id     = "${aws.vpc.main.id}"
-  cidr_block = "${var.proxy_az2_subnet_cidr}"
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.proxy_az2_subnet_cidr}"
+  availability_zone = "${data.aws_availability_zones.available.names[1]}"
 
   tags {
-    Name = "Subnet used by EC2 instances to provide proxy functionality"
+    Name = "Subnet_Proxy"
   }
 }
 
@@ -66,15 +72,8 @@ resource "aws_subnet" "proxy_az2_subnet" {
 resource "aws_route_table" "workspace_route_table" {
   vpc_id = "${aws_vpc.main.id}"
 
-  #route {
-  # cidr_block = "0.0.0.0/0"
-
-
-  #gateway_id = "${aws_elb."
-  #}
-
   tags {
-    Name = "Route table used by proxy subnets"
+    Name = "Route table used by workspace subnets"
   }
 }
 
@@ -117,30 +116,30 @@ resource "aws_network_acl" "workspace_network_acl" {
   vpc_id = "${aws_vpc.main.id}"
 
   subnet_ids = [
-    "${aws_subnet.workspaces_az1_subnet_cidr.id}",
-    "${aws_subnet.workspaces_az2_subnet_cidr.id}",
+    "${aws_subnet.workspaces_az1_subnet.id}",
+    "${aws_subnet.workspaces_az2_subnet.id}",
   ]
 
   egress {
-    protocol   = "*"
-    rule_no    = 200
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = "*"
-    to_port    = "*"
-  }
-
-  ingress {
-    protocol   = "*"
+    protocol   = "-1"
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = "*"
-    to_port    = "*"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  ingress {
+    protocol   = "-1"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 
   tags {
-    Name = "main"
+    Name = "nacl_workspaces"
   }
 }
 
@@ -148,36 +147,36 @@ resource "aws_network_acl" "proxy_network_acl" {
   vpc_id = "${aws_vpc.main.id}"
 
   subnet_ids = [
-    "${aws_subnet.proxy_az1_subnet_cidr.id}",
-    "${aws_subnet.proxy_az2_subnet_cidr.id}",
+    "${aws_subnet.proxy_az1_subnet.id}",
+    "${aws_subnet.proxy_az2_subnet.id}",
   ]
 
   egress {
-    protocol   = "*"
+    protocol   = "-1"
     rule_no    = 200
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = "*"
-    to_port    = "*"
+    from_port  = 0
+    to_port    = 0
   }
 
   ingress {
-    protocol   = "*"
+    protocol   = "-1"
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = "*"
-    to_port    = "*"
+    from_port  = 0
+    to_port    = 0
+  }
 
-    tags {
-      Name = "main"
-    }
+  tags {
+    Name = "nacl_proxy"
   }
 }
 
 ### Security Groups Section ###
 resource "aws_security_group" "workspace_sg" {
-  name        = "sg-workspaces"
+  name        = "workspaces-sg"
   description = "Allow all inbound traffic"
   vpc_id      = "${aws_vpc.main.id}"
 
@@ -197,7 +196,7 @@ resource "aws_security_group" "workspace_sg" {
 }
 
 resource "aws_security_group" "proxy_sg" {
-  name        = "sg-proxy"
+  name        = "proxy-sg"
   description = "Allow all inbound traffic"
   vpc_id      = "${aws_vpc.main.id}"
 
@@ -227,8 +226,8 @@ resource "aws_vpc_endpoint" "private-s3" {
         "Statement": [
             {
                 "Action": "*",
-                "Effect":"Allow"
-                "Resource": "*"
+                "Effect":"Allow",
+                "Resource": "*",
                 "Principal": "*"
             }
         ]
@@ -264,21 +263,14 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = "${aws_vpc.main.id}"
 
   tags {
-    Description = "Internet gateway used by ${aws_vpc.main}"
+    Description = "Internet gateway used by ${aws_vpc.main.id}"
   }
 }
 
-### VPC Peering Section ###
-resource "aws_vpc_peering_connection" "peering_connection" {
-  peer_owner_id = "${var.peer_owner_id}"
-  peer_vpc_id   = "${var.peer_vpc_id}"
-  vpc_id        = "${aws_vpc.main.id}"
-}
-
-# elb
-# asg
-# asg security groups
-# ebs
-# private zone
-# dns conditional forwarder
+# ### VPC Peering Section ###
+# resource "aws_vpc_peering_connection" "peering_connection" {
+#   peer_owner_id = "${var.peer_owner_id}"
+#   peer_vpc_id   = "${var.peer_vpc_id}"
+#   vpc_id        = "${aws_vpc.main.id}"
+# }
 

@@ -7,19 +7,19 @@ variable "vpc_cidr" {
 }
 
 variable "workspace_az1_subnet_cidr" {
-  default = "10.0.0.0/24"
-}
-
-variable "workspace_az2_subnet_cidr" {
   default = "10.0.1.0/24"
 }
 
-variable "proxy_az1_subnet_cidr" {
+variable "workspace_az2_subnet_cidr" {
   default = "10.0.2.0/24"
 }
 
-variable "proxy_az2_subnet_cidr" {
+variable "proxy_az1_subnet_cidr" {
   default = "10.0.3.0/24"
+}
+
+variable "proxy_az2_subnet_cidr" {
+  default = "10.0.4.0/24"
 }
 
 variable "customer_bgp_asn" {
@@ -30,6 +30,8 @@ variable "customer_gateway_tunnel_ip" {
   default = "172.0.0.1"
 }
 
-variable "peer_owner_id" {}
+# variable "peer_owner_id" {}
 
-variable "peer_vpc_id" {}
+
+# variable "peer_vpc_id" {}
+
