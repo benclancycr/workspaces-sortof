@@ -22,3 +22,9 @@ resource "aws_s3_bucket" "bucket_for_keys" {
     Description = "Bucket used to store ssh public keys"
   }
 }
+
+resource "aws_s3_bucket_object" "key_folder" {
+  bucket = "${aws_s3_bucket.bucket_for_keys.id}"
+  key    = "SSH_PUB_KEYS/"
+  source = "/dev/null"
+}
