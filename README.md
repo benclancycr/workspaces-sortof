@@ -29,17 +29,21 @@ git clone <https://github.com/benclancycr/workspaces-sortof.git>
 cd workspaces-sortof 
 export AWS_ACCESS_KEY_ID="anaccesskey"
 export AWS_SECRET_ACCESS_KEY="asecretkey"
+```
 
 Each subfolder will need to get initialised, run the following:
 
+```
 cd terraform/global/iam/ && terraform init
 cd terraform/global/s3/ && terraform init
 cd terraform/prod/ && terraform init
 cd terraform/global/route53/ && terraform init
 cd terraform/prod/lambda/ && terraform init
+```
 
 Once initialised, run the following in each sub folder (Important: Match the order above):
 
+```
 terraform plan  
 terraform apply  
 ```
